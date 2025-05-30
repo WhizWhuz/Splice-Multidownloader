@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="style.css" />
+    <title>Splice Multi-Downloader</title>
+  </head>
+  <body>
+    <div class="main">
+      <h2>Choose Sounds</h2>
+      <button id="downloadSelected">Download Selected</button>
+      <button id="clearAll" style="margin-top: 8px; background-color: crimson">
+        Clear All
+      </button>
+      <button
+        id="selectAll"
+        style="margin-top: 8px; background-color: #444; color: white"
+      >
+        Select All Sounds
+      </button>
+    </div>
+    <div
+      id="completionFlash"
+      style="display: none; text-align: center; padding: 8px"
+    >
+      <span style="font-weight: bold; color: #4caf50"
+        >✔ All downloads triggered!</span
+      >
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
