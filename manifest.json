@@ -6,7 +6,6 @@
   "permissions": ["downloads", "storage", "scripting", "tabs"],
   "host_permissions": ["*://splice.com/*"],
   "action": {
-    "default_popup": "popup.html",
     "default_icon": {
       "16": "icon_16.png",
       "48": "icon_48.png",
@@ -18,13 +17,19 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://splice.com/*"],
-      "js": ["js/jszip.min.js", "content.js"]
+      "matches": ["*://*.splice.com/*"],
+      "js": ["js/interceptor.js"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["*://*.splice.com/*"],
+      "js": ["js/jszip.min.js", "content.js"],
+      "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["js/jszip.min.js"],
+      "resources": ["js/jszip.min.js", "js/injected-sniffer.js"],
       "matches": ["<all_urls>"]
     }
   ]

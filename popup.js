@@ -7,9 +7,10 @@ function renderSoundList(sounds) {
   listContainer.style.maxHeight = "200px";
   listContainer.style.overflowY = "auto";
   listContainer.style.marginBottom = "10px";
-  listContainer.style.padding = "4px";
-  listContainer.style.border = "1px solid #ccc";
-  listContainer.style.borderRadius = "4px";
+  listContainer.style.padding = "8px";
+  listContainer.style.borderRadius = "0.5rem";
+  listContainer.style.border = "1px solid black";
+  listContainer.style.backgroundColor = "white";
 
   if (!sounds || sounds.length === 0) {
     listContainer.textContent = "No sounds selected yet.";
@@ -22,6 +23,7 @@ function renderSoundList(sounds) {
       const li = document.createElement("li");
       li.textContent = sound.label;
       li.style.padding = "2px 0";
+
       list.appendChild(li);
     }
 
@@ -105,4 +107,35 @@ document.getElementById("clearAll").addEventListener("click", async () => {
     msg.style.color = "crimson";
     document.body.prepend(msg);
   });
+});
+
+async function sendToActiveTab(action) {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (tab?.id) {
+    chrome.tabs.sendMessage(tab.id, { action });
+  }
+}
+
+document.getElementById("selectAllBtn").addEventListener("click", () => {
+  sendToActiveTab("SELECT_ALL");
+});
+
+document.getElementById("deselectAllBtn").addEventListener("click", () => {
+  sendToActiveTab("DESELECT_ALL");
+});
+
+document.getElementById("downloadBtn").addEventListener("click", () => {
+  sendToActiveTab("START_ZIP_DOWNLOAD");
+});
+
+function sendToContent(action) {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (!tabs.length) return;
+    chrome.tabs.sendMessage(tabs[0].id, { action });
+  });
+}
+
+// example usage:
+document.getElementById("selectAllBtn").addEventListener("click", () => {
+  sendToContent("SELECT_ALL");
 });
