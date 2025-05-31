@@ -7,9 +7,10 @@ function renderSoundList(sounds) {
   listContainer.style.maxHeight = "200px";
   listContainer.style.overflowY = "auto";
   listContainer.style.marginBottom = "10px";
-  listContainer.style.padding = "4px";
-  listContainer.style.border = "1px solid #ccc";
-  listContainer.style.borderRadius = "4px";
+  listContainer.style.padding = "8px";
+  listContainer.style.borderRadius = "0.5rem";
+  listContainer.style.border = "1px solid black";
+  listContainer.style.backgroundColor = "white";
 
   if (!sounds || sounds.length === 0) {
     listContainer.textContent = "No sounds selected yet.";
