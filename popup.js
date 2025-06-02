@@ -21,8 +21,14 @@ function renderSoundList(sounds) {
 
     for (const sound of sounds) {
       const li = document.createElement("li");
+
       li.textContent = sound.label;
+      li.dataset.label = sound.label;
       li.style.padding = "2px 0";
+
+      const status = sound.status || "pending";
+      li.classList.add(`status-${status}`);
+
       list.appendChild(li);
     }
 
@@ -48,7 +54,6 @@ window.addEventListener("DOMContentLoaded", () => {
 document.getElementById("downloadSelected").addEventListener("click", () => {
   chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
     chrome.tabs.sendMessage(tab.id, { action: "START_ZIP_DOWNLOAD" });
-    console.log("📨 Sent START_ZIP_DOWNLOAD to content script.");
   });
 });
 
@@ -67,8 +72,10 @@ document.getElementById("selectAll").addEventListener("click", async () => {
         if (!checkbox.checked) {
           checkbox.checked = true;
           const row = checkbox.closest("core-sample-asset-list-row");
-          const label = row ? row.innerText.slice(0, 50) : `Sound ${index}`;
-          selected.push({ id: `row-${index}`, label });
+          const labelNode = row.querySelector("h6.filename");
+          const label = labelNode?.textContent?.trim() || `Sound_${index}`;
+
+          selected.push({ id: `row-${index}`, label, status: "pending" });
         }
       });
 
@@ -77,8 +84,7 @@ document.getElementById("selectAll").addEventListener("click", async () => {
   });
 });
 
-// 🧹 Clear All
-document.getElementById("clearAll").addEventListener("click", async () => {
+async function clearAllSelectedSounds() {
   chrome.storage.local.set({ selectedSounds: [] }, async () => {
     const [tab] = await chrome.tabs.query({
       active: true,
@@ -105,5 +111,87 @@ document.getElementById("clearAll").addEventListener("click", async () => {
     msg.textContent = "Selection cleared.";
     msg.style.color = "crimson";
     document.body.prepend(msg);
+  });
+}
+
+document.getElementById("clearAll").addEventListener("click", () => {
+  document.getElementById("clear-options").classList.toggle("hidden");
+});
+
+document.querySelectorAll(".clear-option").forEach((btn) => {
+  btn.addEventListener("click", async () => {
+    const action = btn.dataset.action;
+
+    if (action === "all") {
+      await clearAllSelectedSounds();
+    } else if (action === "finished") {
+      clearSoundRowsByStatus("✅");
+    } else if (action === "errors") {
+      clearSoundRowsByStatus("⚠️");
+    }
+  });
+});
+
+function clearSoundRowsByStatus(statusSymbol) {
+  document.querySelectorAll(".sound-row").forEach((row) => {
+    const status = row.querySelector(".status")?.textContent;
+    if (status === statusSymbol) row.remove();
+  });
+}
+
+document.getElementById("add-to-library").addEventListener("click", () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.sendMessage(tabs[0].id, { action: "START_ADD_TO_LIBRARY" });
+  });
+});
+
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === "LIBRARY_STATUS") {
+    const { label, status } = message;
+    updateRowStatus(label, status);
+  }
+});
+
+function updateRowStatus(label, status) {
+  const li = document.querySelector(`li[data-label="${label}"]`);
+  if (!li) return;
+
+  li.classList.remove("status-pending", "status-done", "status-error");
+
+  if (status === "success") {
+    li.classList.add("status-done");
+  } else if (status === "error") {
+    li.classList.add("status-error");
+  }
+}
+
+function renderSelectedSounds(sounds) {
+  const container = document.getElementById("selected-sounds");
+  container.innerHTML = ""; // clear old
+
+  sounds.forEach((s) => {
+    const row = document.createElement("div");
+    row.className = "sound-row";
+    row.dataset.label = s.label;
+
+    const label = document.createElement("span");
+    label.className = "label";
+    label.textContent = s.label;
+
+    const status = document.createElement("span");
+    status.className = "spin"; // Add spin class for ⏳
+    status.textContent = "⏳";
+
+    row.appendChild(label);
+    row.appendChild(status);
+    container.appendChild(row);
+  });
+}
+
+document.getElementById("clear-finished").addEventListener("click", () => {
+  document.querySelectorAll(".sound-row .status").forEach((statusSpan) => {
+    if (statusSpan.textContent === "✅") {
+      statusSpan.parentElement.remove();
+    }
   });
 });

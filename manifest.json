@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Splice Multi-Download Ninja",
+  "name": "Splice Multi-Download",
   "version": "1.0",
-  "description": "Download multiple Splice sounds at once like a true web shinobi.",
+  "description": "Add to Library & Download multiple Splice sounds at once.",
   "permissions": ["downloads", "storage", "scripting", "tabs"],
   "host_permissions": ["*://splice.com/*"],
   "action": {
