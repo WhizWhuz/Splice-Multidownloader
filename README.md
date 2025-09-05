@@ -1,3 +1,10 @@
+**Splice Website Multi-Downloader**
+Download multiple files in one go from the Splice website with this Chrome extension.
+
+Spend credits & download samples.
+
+**HOW-TO**
+
 1. Download Zip and extract.
 2. Open Chrome/Brave settings.
 3. Go to Extensions>Manage Extensions>Activate Developer Mode.
